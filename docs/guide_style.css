@@ -1,0 +1,33 @@
+@page { size: A4; margin: 18mm 17mm 20mm 17mm;
+  @bottom-center { content: counter(page) " / " counter(pages); font: 9pt "DejaVu Sans", sans-serif; color: #777; }
+  @top-right { content: "RealFn Viewer — Guide pour l'enseignant"; font: 8pt "DejaVu Sans", sans-serif; color: #999; } }
+@page :first { @top-right { content: none; } @bottom-center { content: none; } }
+html { font-family: "DejaVu Serif", "Liberation Serif", serif; font-size: 10.5pt; line-height: 1.45; color: #1d1d1f; }
+body { margin: 0; }
+header#title-block-header { text-align: center; padding: 70mm 0 0; break-after: page; }
+header h1.title { font-family: "DejaVu Sans", sans-serif; font-size: 30pt; margin: 0 0 6mm; color: #1f3a5f; border: 0; }
+header p.subtitle { font-family: "DejaVu Sans", sans-serif; font-size: 14pt; color: #4a6283; margin: 0; }
+nav#TOC { break-after: page; font-family: "DejaVu Sans", sans-serif; font-size: 9.5pt; }
+nav#TOC::before { content: "Sommaire"; display: block; font-size: 18pt; color: #1f3a5f; margin-bottom: 4mm; }
+nav#TOC ul { list-style: none; padding-left: 0; margin: 0; }
+nav#TOC ul ul { padding-left: 6mm; }
+nav#TOC ul ul ul { display: none; }
+nav#TOC > ul > li { margin-top: 2.5mm; font-weight: bold; }
+nav#TOC > ul > li li { font-weight: normal; margin: 0.6mm 0; }
+nav#TOC a { color: inherit; text-decoration: none; }
+h1, h2, h3 { font-family: "DejaVu Sans", sans-serif; color: #1f3a5f; break-after: avoid; }
+h1 { font-size: 20pt; break-before: page; border-bottom: 2px solid #1f3a5f; padding-bottom: 2mm; margin-top: 0; }
+h2 { font-size: 14pt; margin-top: 7mm; color: #2c5282; }
+h3 { font-size: 11.5pt; margin: 6mm 0 1mm; padding: 1.5mm 3mm; background: #edf2f8; border-left: 4px solid #2c5282; }
+h3 + p em { color: #5a6b80; }
+p { margin: 1.6mm 0; }
+ol, ul { margin: 1mm 0; padding-left: 7mm; }
+li { margin: 0.6mm 0; }
+strong { color: #13263f; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 9pt; background: #f2f4f7; padding: 0 1mm; border-radius: 2px; }
+table { border-collapse: collapse; width: 100%; margin: 3mm 0; font-size: 9.5pt; break-inside: avoid; }
+th, td { border: 1px solid #c8d1dc; padding: 1.5mm 2mm; vertical-align: top; text-align: left; }
+th { background: #1f3a5f; color: white; font-family: "DejaVu Sans", sans-serif; }
+tr:nth-child(even) td { background: #f6f8fb; }
+p:has(> strong:first-child) { break-inside: avoid; }
+section.level3 { break-inside: avoid; }

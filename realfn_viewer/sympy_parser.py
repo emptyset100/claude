@@ -73,6 +73,10 @@ _ALLOWED_FUNCTIONS = frozenset({
     "exp", "log", "ln",
     "sqrt", "Abs", "abs", "sign",
     "Heaviside",  # useful for piecewise-flat functions
+    # Rounding / modulo / extrema — compiled to the matching Math-node
+    # operations (FLOOR, CEIL, FRACT, FLOORED_MODULO, MINIMUM, MAXIMUM).
+    "floor", "ceil", "ceiling", "frac", "Mod", "mod",
+    "Min", "Max", "min", "max",
 })
 
 # Vector / Mathutils helper functions. These take numeric tuples (and/or
@@ -669,6 +673,9 @@ def _base_math_locals() -> dict:
         "sqrt": sp.sqrt,
         "Abs": sp.Abs, "abs": sp.Abs, "sign": sp.sign,
         "Heaviside": sp.Heaviside,
+        "floor": sp.floor, "ceil": sp.ceiling, "ceiling": sp.ceiling,
+        "frac": sp.frac, "Mod": sp.Mod, "mod": sp.Mod,
+        "Min": sp.Min, "Max": sp.Max, "min": sp.Min, "max": sp.Max,
         "pi": sp.pi, "E": sp.E,
     }
     # Vector / Mathutils helpers (shared by every parser variant, since

@@ -40,7 +40,7 @@ from __future__ import annotations
 import bpy
 import sympy as sp
 
-from .compiler import NodeBuilder, SymPyCompiler
+from .compiler import NodeBuilder, SymPyCompiler, compile_outlined
 from . import sympy_parser
 
 
@@ -90,7 +90,9 @@ def _build_curve_path(nb: NodeBuilder, *,
     # 3) Compile the user expression into a sub-graph fed by x_sock.
     var_sockets = {x_var_name: x_sock, **free_param_sockets}
     compiler = SymPyCompiler(nb, var_sockets)
-    y_sock = compiler.compile(expr)
+    y_sock = compile_outlined(nb, compiler, expr,
+                              name=f"{nb.tree.name} {label}",
+                              x=-400, y=y_offset - 100, label=label)
 
     # 4) Build the world-space position (x, y, 0) and write it to
     #    each vertex.

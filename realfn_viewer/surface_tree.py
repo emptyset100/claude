@@ -35,7 +35,7 @@ from __future__ import annotations
 import bpy
 import sympy as sp
 
-from .compiler import NodeBuilder, SymPyCompiler
+from .compiler import NodeBuilder, SymPyCompiler, compile_outlined
 from . import sympy_parser
 
 
@@ -219,24 +219,48 @@ def taylor_surface_terms(f_expr, *, x_name, y_name):
     y_sym = sp_.Symbol(y_name, real=True)
     x0_sym = sp_.Symbol("x_0", real=True)
     y0_sym = sp_.Symbol("y_0", real=True)
-    at_basepoint = {x_sym: x0_sym, y_sym: y0_sym}
+    return homogeneous_taylor_terms(f_expr, x_sym, y_sym, x0_sym, y0_sym,
+                                    TAYLOR_SURFACE_MAX_ORDER)
 
+
+def homogeneous_taylor_terms(expr, a_sym, b_sym, a0_sym, b0_sym, order):
+    """``[D_0 … D_order]`` of a two-variable function about (a₀, b₀).
+
+    Each mixed partial ∂^(i+j)/∂aⁱ∂bʲ is obtained from the previous one
+    by a single differentiation (instead of differentiating ``expr``
+    i+j times from scratch) and evaluated at the basepoint with
+    ``xreplace`` — a purely structural substitution, much cheaper than
+    ``subs`` and exact here since we only swap symbols for symbols.
+    """
+    sp_ = sympy_parser._sympy()
+    at_basepoint = {a_sym: a0_sym, b_sym: b0_sym}
+    partials = {(0, 0): expr}
     terms = []
-    for k in range(TAYLOR_SURFACE_MAX_ORDER + 1):
-        dk = sp_.S.Zero
+    for k in range(order + 1):
+        parts = []
         for i in range(k + 1):
             j = k - i
-            coeff = sp_.diff(f_expr, (x_sym, i), (y_sym, j)).subs(at_basepoint)
-            dk += (coeff
-                   * (x_sym - x0_sym) ** i
-                   * (y_sym - y0_sym) ** j
-                   / (sp_.factorial(i) * sp_.factorial(j)))
+            if (i, j) not in partials:
+                if j > 0:
+                    partials[(i, j)] = sp_.diff(partials[(i, j - 1)], b_sym)
+                else:
+                    partials[(i, j)] = sp_.diff(partials[(i - 1, 0)], a_sym)
+            coeff = partials[(i, j)].xreplace(at_basepoint)
+            if coeff == 0:
+                continue
+            parts.append(coeff
+                         * (a_sym - a0_sym) ** i
+                         * (b_sym - b0_sym) ** j
+                         / (sp_.factorial(i) * sp_.factorial(j)))
         # Keep the *factored* form (no expand): the SymPy→nodes compiler
         # memo-shares identical subexpressions, so the (x-x₀)ⁱ powers and
         # the basepoint coefficients are built once and reused. Expanding
         # would blow each term into a flat sum of monomials and create
         # thousands of un-shared nodes — slow to build and to evaluate.
-        terms.append(dk)
+        terms.append(sp_.Add(*parts))
+        # Partials of degree k-1 are no longer needed.
+        for i in range(k):
+            partials.pop((i, k - 1 - i), None)
     return terms
 
 
@@ -290,7 +314,9 @@ def _build_taylor_surface_mesh(nb: NodeBuilder, *,
     z_acc = None
     for k, dk in enumerate(taylor_terms):
         row_y = y_offset - 300 - 45 * k
-        zk = comp.compile(dk)
+        zk = compile_outlined(nb, comp, dk,
+                              name=f"{nb.tree.name} D{k}",
+                              x=-600, y=row_y, label=f"D_{k}")
         # mask_k = 1.0 if order ≥ k else 0.0  (k-0.5 keeps the Int compare
         # robust against float rounding).
         mask = nb.math("GREATER_THAN", order_sock, k - 0.5,

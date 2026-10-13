@@ -28,6 +28,8 @@ from __future__ import annotations
 
 import bpy
 
+from . import modifier_inputs
+
 
 MATERIAL_PREFIX = "RealFn "
 
@@ -74,6 +76,35 @@ def _full_name(short: str) -> str:
     return MATERIAL_PREFIX + short
 
 
+def _material_node_tree(mat):
+    """Return ``mat``'s shader node tree, enabling nodes when needed.
+
+    Blender 5.0+ always uses nodes for materials and deprecates the
+    ``use_nodes`` toggle (setting it only emits a warning); older
+    versions still need it switched on to create the default tree.
+    """
+    if bpy.app.version < (5, 0, 0) and not mat.use_nodes:
+        mat.use_nodes = True
+    return mat.node_tree
+
+
+def _find_node(node_tree, bl_idname: str):
+    """First node of the given type. Looked up by type rather than by
+    name: with *Preferences › Interface › Translation › New Data*
+    enabled the default node is called e.g. "BSDF Principled" in French
+    and a name lookup silently misses it."""
+    if node_tree is None:
+        return None
+    for node in node_tree.nodes:
+        if node.bl_idname == bl_idname:
+            return node
+    return None
+
+
+def _principled(mat):
+    return _find_node(mat.node_tree, "ShaderNodeBsdfPrincipled")
+
+
 def _make_material(short_name: str, rgb: tuple) -> "bpy.types.Material":
     """Create one palette material with a Principled BSDF feeding the colour.
 
@@ -85,9 +116,8 @@ def _make_material(short_name: str, rgb: tuple) -> "bpy.types.Material":
     """
     name = _full_name(short_name)
     mat = bpy.data.materials.new(name=name)
-    mat.use_nodes = True
-    # Default tree: Principled BSDF named "Principled BSDF".
-    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    _material_node_tree(mat)
+    bsdf = _principled(mat)
     if bsdf is not None:
         # "Base Color" is the input name across Blender 3.x and 4.x.
         bc = bsdf.inputs.get("Base Color")
@@ -171,10 +201,9 @@ def apply_kinematic_color_code(modifier) -> dict:
         if mat is None:
             n_skipped += 1
             continue
-        try:
-            modifier[item.identifier] = mat
+        if modifier_inputs.set_value(modifier, item.identifier, mat):
             n_applied += 1
-        except (TypeError, KeyError):
+        else:
             n_skipped += 1
     return {"applied": n_applied, "skipped": n_skipped}
 
@@ -227,12 +256,11 @@ def _make_scalar_field_3d_material() -> "bpy.types.Material":
     cheaper than HSL with monotonic luminance.
     """
     mat = bpy.data.materials.new(name=SCALAR_FIELD_3D_MATERIAL_NAME)
-    mat.use_nodes = True
-    nt = mat.node_tree
+    nt = _material_node_tree(mat)
     # Clean slate — Blender pre-populates Principled BSDF + Output, we
     # keep them but rewire.
-    bsdf = nt.nodes.get("Principled BSDF")
-    output = nt.nodes.get("Material Output")
+    bsdf = _find_node(nt, "ShaderNodeBsdfPrincipled")
+    output = _find_node(nt, "ShaderNodeOutputMaterial")
     if bsdf is None or output is None:
         # Defensive: in some unusual default trees these may be absent
         bsdf = nt.nodes.new("ShaderNodeBsdfPrincipled")
@@ -307,12 +335,11 @@ def apply_palette(palette_dict: dict) -> None:
         mat = bpy.data.materials.get(_full_name(short))
         if mat is None:
             continue
-        if mat.use_nodes and mat.node_tree is not None:
-            bsdf = mat.node_tree.nodes.get("Principled BSDF")
-            if bsdf is not None:
-                bc = bsdf.inputs.get("Base Color")
-                if bc is not None:
-                    bc.default_value = (r, g, b, 1.0)
+        bsdf = _principled(mat)
+        if bsdf is not None:
+            bc = bsdf.inputs.get("Base Color")
+            if bc is not None:
+                bc.default_value = (r, g, b, 1.0)
         mat.diffuse_color = (r, g, b, 1.0)
 
 
@@ -330,8 +357,8 @@ def snapshot_palette() -> dict:
     snap = {}
     for short in DEFAULT_PALETTE:
         mat = bpy.data.materials.get(_full_name(short))
-        if mat is not None and mat.use_nodes and mat.node_tree is not None:
-            bsdf = mat.node_tree.nodes.get("Principled BSDF")
+        if mat is not None:
+            bsdf = _principled(mat)
             if bsdf is not None:
                 bc = bsdf.inputs.get("Base Color")
                 if bc is not None:

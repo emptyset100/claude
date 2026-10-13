@@ -17,8 +17,9 @@ from __future__ import annotations
 
 import bpy
 
-from . import (bench_tree, builtin_presets, default_materials, i18n,
-                memorize, parametric_surface_tree, preset_ops, presets,
+from . import (bench_tree, builtin_presets, compiler, default_materials,
+                i18n, memorize, modifier_inputs, parametric_surface_tree,
+                preset_ops, presets,
                 scalar_field_3d_tree, surface_tree, sympy_parser, tree,
                 vector_field_3d_tree, vector_tree)
 
@@ -437,8 +438,8 @@ class REALFN_OT_edit(bpy.types.Operator):
             if getattr(item, "in_out", None) != "INPUT":
                 continue
             try:
-                v = float(mod[item.identifier])
-            except (TypeError, ValueError, KeyError):
+                v = float(modifier_inputs.get_value(mod, item.identifier))
+            except (TypeError, ValueError):
                 continue
             if item.name == "x min":
                 xmin = v
@@ -459,7 +460,9 @@ class REALFN_OT_edit(bpy.types.Operator):
         except ValueError as exc:
             self.report({"ERROR"}, str(exc))
             return {"CANCELLED"}
+        old_nt = mod.node_group
         mod.node_group = new_nt
+        compiler.release_tree(old_nt, keep=new_nt)
         obj = context.active_object
         if obj is not None:
             obj.name = f"y = {self.expr}"
@@ -502,13 +505,12 @@ def _visibility_items(modifier):
             continue
         if not item.name.startswith("Visible · "):
             continue
-        try:
-            # ``modifier[id]`` for a NodeSocketBool returns a bool on
-            # Blender 5.1+ and an int on earlier builds — ``bool(x)``
-            # normalises both into a Python bool.
-            current = bool(modifier[item.identifier])
-        except (KeyError, TypeError, ValueError):
-            current = bool(getattr(item, "default_value", True))
+        # Bool sockets read back as bool (5.1+) or int (earlier builds)
+        # — ``bool(x)`` normalises both.
+        value = modifier_inputs.get_value(modifier, item.identifier)
+        if value is None:
+            value = getattr(item, "default_value", True)
+        current = bool(value)
         yield item, item.identifier, current
 
 
@@ -549,8 +551,8 @@ def _apply_visibility_change(context, transform):
             # existing 'Socket_N' Boolean IDProperty``. Earlier
             # versions accepted both transparently. ``bool`` is the
             # documented and now-required write type.
-            mod[identifier] = new_value
-            n_changed += 1
+            if modifier_inputs.set_value(mod, identifier, new_value):
+                n_changed += 1
     if n_changed > 0:
         obj = context.active_object
         if obj is not None:
@@ -759,10 +761,7 @@ class REALFN_OT_copy_taylor_poly(bpy.types.Operator):
     def _socket_value(mod, nt, name):
         for it in nt.interface.items_tree:
             if getattr(it, "in_out", None) == "INPUT" and it.name == name:
-                try:
-                    return mod[it.identifier]
-                except (KeyError, TypeError):
-                    return None
+                return modifier_inputs.get_value(mod, it.identifier)
         return None
 
     def execute(self, context):
@@ -1050,10 +1049,7 @@ def _build_and_spawn_bench(context, rows, params, name="Banc de vecteurs"):
         for p in params:
             it = by_name.get(p)
             if it is not None:
-                try:
-                    mod[it.identifier] = 0.7
-                except (KeyError, TypeError):
-                    pass
+                modifier_inputs.set_value(mod, it.identifier, 0.7)
     # Populate the editable definition so the panel fields are pre-filled
     # and the bench can be modified live afterwards.
     try:
@@ -1492,7 +1488,9 @@ class REALFN_OT_restore_snapshot(bpy.types.Operator):
         if old_ts:
             new_nt[memorize.SNAPSHOT_SAVED_AT_PROP] = old_ts
 
+        old_nt = mod.node_group
         mod.node_group = new_nt
+        compiler.release_tree(old_nt, keep=new_nt)
         obj = context.active_object
         if obj is not None:
             obj.name = _object_name_for(kind, snapshot)
@@ -1911,17 +1909,12 @@ class REALFN_OT_create_scalar_field_3d(bpy.types.Operator):
             if getattr(item, "in_out", None) != "INPUT":
                 continue
             if item.name == "Marker material":
-                try:
-                    mod[item.identifier] = scalar_field_mat
-                except (KeyError, TypeError):
-                    pass
+                modifier_inputs.set_value(mod, item.identifier,
+                                          scalar_field_mat)
             elif (item.name in ("Label material", "Frame material",
                                   "Axis label material")
                     and label_mat is not None):
-                try:
-                    mod[item.identifier] = label_mat
-                except (KeyError, TypeError):
-                    pass
+                modifier_inputs.set_value(mod, item.identifier, label_mat)
         self.report({"INFO"}, f"Champ scalaire 3D créé : {obj.name}")
         return {"FINISHED"}
 
@@ -2144,10 +2137,7 @@ class REALFN_OT_create_vector_field_3d(bpy.types.Operator):
                         and item.name in ("Norm label material",
                                            "Frame material",
                                            "Axis label material")):
-                    try:
-                        mod[item.identifier] = nlbl_mat
-                    except (KeyError, TypeError):
-                        pass
+                    modifier_inputs.set_value(mod, item.identifier, nlbl_mat)
         self.report({"INFO"}, f"Champ de vecteurs 3D créé : {obj.name}")
         return {"FINISHED"}
 
@@ -2202,7 +2192,18 @@ def _socket_identifier(node_group, name):
 
 
 def _basepoint_data_path(mod, bp_id):
-    return f'modifiers["{mod.name}"]["{bp_id}"]'
+    return modifier_inputs.input_data_path(mod, bp_id)
+
+
+def _basepoint_data_paths(mod, bp_id):
+    """Every path a basepoint sweep may live under: the current API's
+    and the pre-5.2 IDProperty form (animations made in older files)."""
+    name = mod.name.replace("\\", "\\\\").replace('"', '\\"')
+    return {
+        _basepoint_data_path(mod, bp_id),
+        f'modifiers["{name}"]["{bp_id}"]',
+        f'modifiers["{name}"].properties.inputs.{bp_id}.value',
+    }
 
 
 def _iter_action_fcurves(obj):
@@ -2266,9 +2267,9 @@ class REALFN_OT_animate_basepoint(bpy.types.Operator):
             self.report({"ERROR"}, "Sockets de domaine introuvables")
             return {"CANCELLED"}
         try:
-            lo = float(mod[lo_id])
-            hi = float(mod[hi_id])
-        except (KeyError, TypeError, ValueError):
+            lo = float(modifier_inputs.get_value(mod, lo_id))
+            hi = float(modifier_inputs.get_value(mod, hi_id))
+        except (TypeError, ValueError):
             self.report({"ERROR"}, "Bornes du domaine illisibles")
             return {"CANCELLED"}
 
@@ -2277,15 +2278,16 @@ class REALFN_OT_animate_basepoint(bpy.types.Operator):
         if f1 <= f0:
             f1 = f0 + 100
         dp = _basepoint_data_path(mod, bp_id)
+        old_paths = _basepoint_data_paths(mod, bp_id)
 
         # Replace (not stack) any prior sweep on this exact path.
         for coll, fc in list(_iter_action_fcurves(obj)):
-            if fc.data_path == dp:
+            if fc.data_path in old_paths:
                 coll.remove(fc)
 
-        mod[bp_id] = lo
+        modifier_inputs.set_value(mod, bp_id, lo)
         obj.keyframe_insert(data_path=dp, frame=f0)
-        mod[bp_id] = hi
+        modifier_inputs.set_value(mod, bp_id, hi)
         obj.keyframe_insert(data_path=dp, frame=f1)
 
         # Linear interpolation → constant-speed sweep.
@@ -2336,11 +2338,11 @@ class REALFN_OT_clear_basepoint_animation(bpy.types.Operator):
         kind = nt.get("realfn_kind", "scalar")
         bp_name = _BASEPOINT_SWEEP.get(kind, _BASEPOINT_SWEEP["scalar"])[0]
         bp_id = _socket_identifier(nt, bp_name)
-        dp = _basepoint_data_path(mod, bp_id) if bp_id else None
+        paths = _basepoint_data_paths(mod, bp_id) if bp_id else set()
         removed = 0
-        if dp:
+        if paths:
             for coll, fc in list(_iter_action_fcurves(obj)):
-                if fc.data_path == dp:
+                if fc.data_path in paths:
                     coll.remove(fc)
                     removed += 1
         mod.node_group = mod.node_group

@@ -342,7 +342,10 @@ def _apply_execute(spec):
         except ValueError as exc:
             self.report({"ERROR"}, f"Construction depuis preset : {exc}")
             return {"CANCELLED"}
+        old_nt = mod.node_group
         mod.node_group = new_nt
+        from .compiler import release_tree
+        release_tree(old_nt, keep=new_nt)
         obj = context.active_object
         if obj is not None:
             obj.name = spec.object_name(data)

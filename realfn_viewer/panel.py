@@ -9,7 +9,8 @@ import bpy
 
 from . import i18n
 
-from . import bench_tree, builtin_presets, memorize, operators, presets, tree
+from . import (bench_tree, builtin_presets, memorize, modifier_inputs,
+               operators, presets, tree)
 
 
 # UI label translations
@@ -399,10 +400,7 @@ def _socket_value(mod, nt, name):
     interface by display name."""
     for it in nt.interface.items_tree:
         if getattr(it, "in_out", None) == "INPUT" and it.name == name:
-            try:
-                return mod[it.identifier]
-            except (KeyError, TypeError):
-                return None
+            return modifier_inputs.get_value(mod, it.identifier)
     return None
 
 
@@ -782,8 +780,9 @@ class REALFN_PT_main(bpy.types.Panel):
                 if mdisp is not None:
                     col = mdisp.column(align=True)
                     for item in mat_sockets:
-                        col.prop(mod, f'["{item.identifier}"]',
-                                 text=item.name.replace("Material · ", ""))
+                        modifier_inputs.draw_input(
+                            col, mod, item.identifier,
+                            text=item.name.replace("Material · ", ""))
 
             layout.separator()
 
@@ -1201,8 +1200,10 @@ def _draw_sectioned_params(layout, mod, nt, sections, after_item=None):
             continue  # collapsed panel: header only
         for item in items:
             try:
-                body.prop(mod, f'["{item.identifier}"]',
-                          text=_socket_label(item.name))
+                if not modifier_inputs.draw_input(
+                        body, mod, item.identifier,
+                        text=_socket_label(item.name)):
+                    continue
             except (TypeError, RuntimeError):
                 continue
             if after_item is not None:

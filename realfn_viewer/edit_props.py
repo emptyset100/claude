@@ -133,11 +133,8 @@ def rebuild_edit(obj) -> str:
         apply_fn(data, mod)
     except Exception:
         pass
-    if old is not None and old is not new_nt and old.users == 0:
-        try:
-            bpy.data.node_groups.remove(old)
-        except Exception:
-            pass
+    from .compiler import release_tree
+    release_tree(old, keep=new_nt)
     try:
         obj.data.update()
     except Exception:

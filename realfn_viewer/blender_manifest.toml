@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "realfn_viewer"
-version = "5.5.0"
+version = "5.6.0"
 name = "RealFn Viewer"
 tagline = "Fonctions scalaires y=f(x) et vectorielles F(t) à valeurs dans R³"
 maintainer = "Empty"
@@ -11,7 +11,9 @@ tags = ["3D View", "Geometry Nodes", "Math Vis"]
 
 # SymPy 1.14 needs Python 3.9+. The geometry uses the post-4.0
 # Geometry Nodes interface API and FunctionNodeAlignRotationToVector
-# (available since Blender 4.2).
+# (available since Blender 4.2). Tested up to Blender 5.2.2 LTS, whose
+# new modifier-input API (``mod.properties.inputs``) is handled by
+# modifier_inputs.py alongside the older IDProperty API.
 blender_version_min = "4.3.0"
 
 license = ["SPDX:GPL-3.0-or-later"]

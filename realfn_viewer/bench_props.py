@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import bpy
 
-from . import bench_tree, default_materials, preset_io
+from . import bench_tree, default_materials, modifier_inputs, preset_io
 
 
 _BENCH_PALETTE = ("Bleu", "Vert", "Rouge", "Jaune",
@@ -81,10 +81,8 @@ def rebuild_bench(obj) -> str:
         for it in old.interface.items_tree:
             if getattr(it, "in_out", None) != "INPUT":
                 continue
-            try:
-                saved[it.name] = mod[it.identifier]
-            except KeyError:
-                saved[it.name] = getattr(it, "default_value", None)
+            saved[it.name] = modifier_inputs.get_value(
+                mod, it.identifier, getattr(it, "default_value", None))
 
     try:
         nt = bench_tree.make_vector_bench_tree(rows, allowed_params=params)
@@ -104,21 +102,15 @@ def rebuild_bench(obj) -> str:
     # Colour any row whose material socket is still empty (new rows).
     for idx, (rname, _) in enumerate(rows):
         it = by.get(f"Matériau · {rname}")
-        if it is not None and not mod.get(it.identifier):
+        if it is not None and not modifier_inputs.get_value(mod, it.identifier):
             mat = default_materials.get_palette_material(
                 _BENCH_PALETTE[idx % len(_BENCH_PALETTE)])
             if mat is not None:
-                try:
-                    mod[it.identifier] = mat
-                except (TypeError, KeyError):
-                    pass
+                modifier_inputs.set_value(mod, it.identifier, mat)
 
     # Drop the now-orphaned old tree (safe at timer time).
-    if old is not None and old is not nt and old.users == 0:
-        try:
-            bpy.data.node_groups.remove(old)
-        except Exception:
-            pass
+    from .compiler import release_tree
+    release_tree(old, keep=nt)
 
     try:
         obj.data.update()

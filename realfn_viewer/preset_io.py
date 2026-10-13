@@ -38,6 +38,8 @@ import datetime
 
 import bpy
 
+from . import modifier_inputs
+
 
 # --------------------------------------------------------------------------- #
 # Value <-> socket helpers (shared, previously duplicated per kind)
@@ -85,18 +87,16 @@ def set_modifier_socket(modifier, item, value) -> bool:
     try:
         sock_type = getattr(item, "socket_type", "")
         if "Bool" in sock_type:
-            modifier[item.identifier] = bool(value)
+            value = bool(value)
         elif "Int" in sock_type:
-            modifier[item.identifier] = int(value)
+            value = int(value)
         elif "Float" in sock_type:
-            modifier[item.identifier] = float(value)
+            value = float(value)
         elif "Vector" in sock_type:
-            modifier[item.identifier] = tuple(float(v) for v in value)
-        else:
-            modifier[item.identifier] = value
-        return True
-    except (TypeError, ValueError, KeyError):
+            value = tuple(float(v) for v in value)
+    except (TypeError, ValueError):
         return False
+    return modifier_inputs.set_value(modifier, item.identifier, value)
 
 
 # --------------------------------------------------------------------------- #
@@ -155,10 +155,9 @@ def snapshot(modifier, name: str, spec: Spec) -> dict:
     for item in nt.interface.items_tree:
         if getattr(item, "in_out", None) != "INPUT":
             continue
-        try:
-            value = modifier[item.identifier]
-        except KeyError:
-            value = getattr(item, "default_value", None)
+        value = modifier_inputs.get_value(
+            modifier, item.identifier,
+            getattr(item, "default_value", None))
         route = spec.route(item.name, params)
         if route is None:
             continue
@@ -200,10 +199,9 @@ def apply(preset: dict, modifier, spec: Spec) -> dict:
             if mat is None:
                 n_skipped += 1
                 continue
-            try:
-                modifier[item.identifier] = mat
+            if modifier_inputs.set_value(modifier, item.identifier, mat):
                 n_applied += 1
-            except (TypeError, KeyError):
+            else:
                 n_skipped += 1
             continue
 

@@ -42,8 +42,10 @@ from __future__ import annotations
 import bpy
 import sympy as sp
 
-from .compiler import NodeBuilder, SymPyCompiler, compile_vector_components
+from .compiler import (NodeBuilder, SymPyCompiler, compile_outlined,
+                       compile_vector_components)
 from . import sympy_parser
+from .surface_tree import homogeneous_taylor_terms
 
 
 PARAMETRIC_SURFACE_TREE_PREFIX = "REALFNPSURF_"
@@ -78,27 +80,14 @@ def parametric_taylor_terms(components, *, u_name, v_name):
     v_sym = sp_.Symbol(v_name, real=True)
     u0_sym = sp_.Symbol("u_0", real=True)
     v0_sym = sp_.Symbol("v_0", real=True)
-    at_basepoint = {u_sym: u0_sym, v_sym: v0_sym}
-
-    terms = []
-    for k in range(TAYLOR_SURFACE_MAX_ORDER + 1):
-        triple = []
-        for c in components:
-            dk = sp_.S.Zero
-            for i in range(k + 1):
-                j = k - i
-                coeff = sp_.diff(c, (u_sym, i), (v_sym, j)).subs(at_basepoint)
-                dk += (coeff
-                       * (u_sym - u0_sym) ** i
-                       * (v_sym - v0_sym) ** j
-                       / (sp_.factorial(i) * sp_.factorial(j)))
-            # Factored form (no expand) — the compiler memo-shares the
-            # (u-u₀)ⁱ powers and basepoint coefficients across the three
-            # components and across degrees, keeping the node count (and
-            # both build and eval time) tractable even at order 8.
-            triple.append(dk)
-        terms.append(tuple(triple))
-    return terms
+    # Per component D_0 … D_N (shared helper: incremental partials),
+    # then regrouped by degree. Factored form (no expand) — the compiler
+    # memo-shares the (u-u₀)ⁱ powers and basepoint coefficients.
+    per_comp = [homogeneous_taylor_terms(c, u_sym, v_sym, u0_sym, v0_sym,
+                                         TAYLOR_SURFACE_MAX_ORDER)
+                for c in components]
+    return [tuple(pc[k] for pc in per_comp)
+            for k in range(TAYLOR_SURFACE_MAX_ORDER + 1)]
 
 
 def _build_param_taylor_surface(nb: NodeBuilder, *,
@@ -154,7 +143,10 @@ def _build_param_taylor_surface(nb: NodeBuilder, *,
         mask = nb.math("GREATER_THAN", order_sock, k - 0.5,
                         label=f"order ≥ {k}", x=-560, y=row_y)
         for ci in range(3):
-            zk = comp.compile(triple[ci])
+            zk = compile_outlined(nb, comp, triple[ci],
+                                  name=f"{nb.tree.name} D{k}{'xyz'[ci]}",
+                                  x=-760, y=row_y - 20 * ci,
+                                  label=f"D_{k}[{'xyz'[ci]}]")
             masked = nb.math("MULTIPLY", zk, mask,
                               label=f"D_{k}[{'xyz'[ci]}]",
                               x=-360, y=row_y - 20 * ci)

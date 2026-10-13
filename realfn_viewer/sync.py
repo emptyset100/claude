@@ -37,6 +37,8 @@ from __future__ import annotations
 
 import bpy
 
+from . import modifier_inputs
+
 
 # Reentrancy guard. ``bpy.app.handlers`` callbacks can fire recursively
 # if the work they perform triggers further depsgraph updates — which
@@ -132,8 +134,8 @@ def _depsgraph_handler(scene, _depsgraph):
     if src_id is None:
         return
     try:
-        src_value = float(source_mod[src_id])
-    except (KeyError, TypeError, ValueError):
+        src_value = float(modifier_inputs.get_value(source_mod, src_id))
+    except (TypeError, ValueError):
         return
 
     # Propagate. Re-entrant updates from our own writes are blocked
@@ -147,14 +149,12 @@ def _depsgraph_handler(scene, _depsgraph):
             if dst_id is None:
                 continue
             try:
-                current = float(mod[dst_id])
-            except (KeyError, TypeError, ValueError):
+                current = float(modifier_inputs.get_value(mod, dst_id))
+            except (TypeError, ValueError):
                 current = None
             if current is not None and abs(current - src_value) < _EPSILON:
                 continue
-            try:
-                mod[dst_id] = src_value
-            except (KeyError, TypeError, ValueError):
+            if not modifier_inputs.set_value(mod, dst_id, src_value):
                 continue
             # Force the receiving object's modifier to re-evaluate.
             # Same trick as in the visibility operators — the rebind

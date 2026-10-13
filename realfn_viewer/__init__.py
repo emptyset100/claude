@@ -24,6 +24,13 @@ User-facing flow
 4. Open the modifier panel (or the "Paramètres du modifier" sub-panel
    in the side bar) to scrub x₀, x_min, x_max, and the parameters.
 
+Blender versions
+----------------
+Supported from 4.3 to 5.2 LTS. Blender 5.2 moved Geometry Nodes
+modifier inputs from IDProperties (``mod["Socket_2"]``) to a typed RNA
+interface (``mod.properties.inputs.Socket_2.value``);
+:mod:`modifier_inputs` hides the difference from the rest of the code.
+
 Security
 --------
 User-typed formulas are passed through a strict AST whitelist before
@@ -34,7 +41,7 @@ blocked at parse time.
 
 from __future__ import annotations
 
-__version__ = "5.5.0"
+__version__ = "5.6.0"
 
 import bpy
 

@@ -1,0 +1,35 @@
+schema_version = "1.0.0"
+
+id = "realfn_viewer"
+version = "5.5.0"
+name = "RealFn Viewer"
+tagline = "Fonctions scalaires y=f(x) et vectorielles F(t) à valeurs dans R³"
+maintainer = "Empty"
+type = "add-on"
+
+tags = ["3D View", "Geometry Nodes", "Math Vis"]
+
+# SymPy 1.14 needs Python 3.9+. The geometry uses the post-4.0
+# Geometry Nodes interface API and FunctionNodeAlignRotationToVector
+# (available since Blender 4.2).
+blender_version_min = "4.3.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+
+# All wheels are pure Python (py3-none-any) so the extension works
+# unchanged on every Blender platform.
+platforms = ["linux-x64", "windows-x64", "macos-arm64", "macos-x64"]
+
+wheels = [
+    "./wheels/mpmath-1.3.0-py3-none-any.whl",
+    "./wheels/sympy-1.14.0-py3-none-any.whl",
+]
+
+[build]
+paths_exclude_pattern = [
+    "__pycache__/",
+    "/.git/",
+    "/*.zip",
+    ".DS_Store",
+    "*.pyc",
+]

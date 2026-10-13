@@ -1,6 +1,6 @@
 ---
 title: "RealFn Viewer — Guide pour l'enseignant"
-subtitle: "Prise en main et 37 travaux pratiques de mathématiques et de mécanique"
+subtitle: "Prise en main, 70 travaux pratiques et 10 défis de mathématiques et de mécanique"
 lang: fr
 ---
 
@@ -105,7 +105,7 @@ Panneaux 2 et 3 : x(t), y(t), z(t) dans trois champs séparés.
 3. **Je calcule** : le calcul qui confirme ou infirme la prévision.
 4. **Je conclus** : la propriété mathématique en une phrase.
 
-# Les travaux pratiques
+# Travaux pratiques — première série
 
 Chaque TP indique le niveau conseillé (à titre indicatif), une durée,
 les objectifs, la mise en place dans l'extension, des questions pour
@@ -771,6 +771,570 @@ nulle à l'équateur, maximale au pôle (un tour par rotation du
 référentiel). Roue : même cycloïde ; v = 0 au point de contact avec le
 sol. Gyroscope : Ω change de norme et de direction.
 
+# Travaux pratiques — deuxième série
+
+Même présentation que la première série. Les TP de cette série
+utilisent d'autres presets et prolongent la première série, partie par
+partie.
+
+## H. Fonctions d'une variable (suite)
+
+### TP 38 — Asymptotes et comportement à l'infini
+
+*Niveau : 1re–Terminale · Durée : 45 min*
+
+**Mise en place.** Presets **« Fonction rationnelle : (x²-1)/(x²+1) »**,
+**« Hyperbole : 1/x »** et **« Tangente : tan(x) »**, avec l'ordre des
+dérivées 1. Élargir l'intervalle (x min = −10, x max = 10) pour la
+rationnelle.
+
+**Questions.**
+
+1. Rationnelle : vers quelle valeur tend f quand x devient grand ? La
+   courbe coupe-t-elle cette droite ?
+2. Écrire f(x) = 1 − 2/(x² + 1) et en déduire le minimum de f.
+3. Tangente : où sont les asymptotes verticales ? Pourquoi la courbe
+   f' reste-t-elle toujours au-dessus de y = 1 ?
+
+**Éléments de réponse.** Asymptote y = 1, jamais atteinte (f < 1).
+Minimum f(0) = −1, zéros en ±1. tan' = 1 + tan² ≥ 1 ; asymptotes en
+x = π/2 + kπ.
+
+### TP 39 — Fonctions hyperboliques et chaînette
+
+*Niveau : Terminale–Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Caténaire : a · cosh(x/a) »**, puis
+« Modifier la formule / les ordres » : ordre des dérivées 1, ordre de
+Taylor 2, x₀ = 0. Ouvrir aussi **« Sinus hyperbolique : sinh(x) »**.
+
+**Questions.**
+
+1. Quelle est la dérivée de a·cosh(x/a) ? La comparer au preset sinh.
+2. Écrire T₂ en 0. Une chaînette est-elle une parabole ?
+3. Faire varier a : comment évolue la « largeur » de la chaînette ?
+
+**Éléments de réponse.** (a cosh(x/a))' = sinh(x/a).
+T₂(x) = a + x²/(2a) : près du bas, la chaînette ressemble à une
+parabole, mais elle croît exponentiellement loin de 0. cosh² − sinh² = 1.
+
+### TP 40 — Polynôme de Tchebychev
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Preset **« Polynôme de Tchebychev T₅(x) »**
+(16x⁵ − 20x³ + 5x) ; régler x min = −1,2, x max = 1,2 ; ordre des
+dérivées 1.
+
+**Questions.**
+
+1. Sur [−1, 1], entre quelles valeurs la courbe reste-t-elle ?
+2. Combien de fois atteint-elle ±1 ? Combien de racines ?
+3. Vérifier que T₅(cos θ) = cos(5θ) pour θ = 0, π/5, π/2.
+
+**Éléments de réponse.** |T₅| ≤ 1 sur [−1, 1] ; ±1 atteint en 6 points
+xₖ = cos(kπ/5) ; 5 racines cos((2k+1)π/10). C'est l'équioscillation
+qui rend ces polynômes optimaux pour l'approximation.
+
+### TP 41 — Partie entière, partie fractionnaire, modulo
+
+*Niveau : 2de–1re · Durée : 30 min*
+
+**Mise en place.** Créer successivement `floor(x)`, `frac(x)`,
+`Mod(x, 2)`, `x - floor(x)`, `max(x, 0)`, `clamp(x, -1, 1)` sur
+[−3, 3], avec l'ordre des dérivées 1.
+
+**Questions.**
+
+1. Comparer `frac(x)` et `x - floor(x)`.
+2. Quelle est la période de `Mod(x, 2)` ?
+3. Où ces fonctions sont-elles discontinues ? Que montre la courbe f'
+   entre deux sauts ?
+4. Les sauts apparaissent comme des segments presque verticaux.
+   Font-ils partie du graphe ?
+
+**Éléments de réponse.** frac(x) = x − ⌊x⌋ ; Mod(x, 2) est 2-périodique.
+⌊x⌋ est discontinue aux entiers et de dérivée nulle entre eux. Les
+segments verticaux sont un artefact du tracé (points voisins reliés),
+pas des points du graphe.
+
+### TP 42 — Transformations de courbes
+
+*Niveau : 2de–1re · Durée : 45 min*
+
+**Mise en place.** « Créer une courbe… » avec `a*exp(-(b*(x - c))**2) + d`
+et les paramètres libres `a, b, c, d`.
+
+**Questions.** Faire varier un seul curseur à la fois. Quel paramètre :
+translate horizontalement ? verticalement ? étire verticalement ?
+comprime horizontalement ? Que se passe-t-il pour a < 0 ? Pour b < 0 ?
+
+**Éléments de réponse.** c : translation horizontale ; d : verticale ;
+a : dilatation verticale (symétrie par rapport à l'axe Ox si a < 0) ;
+b : contraction horizontale de facteur |b|. Pour b < 0 rien ne change
+car la fonction est paire.
+
+### TP 43 — Méthode de Newton
+
+*Niveau : Terminale–Supérieur · Durée : 45 min*
+
+**Mise en place.** Courbe `x**2 - 2`, ordre de Taylor 1 (tangente T₁),
+x₀ = 2. Vue de face, orthographique (touches 1 et 5).
+
+**Questions.**
+
+1. Où la tangente coupe-t-elle l'axe des abscisses ? Appeler ce point x₁.
+2. Placer x₀ en x₁ et recommencer trois fois. Vers quoi tend la suite ?
+3. Démontrer xₙ₊₁ = xₙ − f(xₙ)/f'(xₙ).
+4. Que se passe-t-il si on part de x₀ = 0 ?
+
+**Éléments de réponse.** x₁ = 1,5 ; x₂ ≈ 1,4167 ; x₃ ≈ 1,41422 → √2
+(le nombre de décimales justes double à chaque étape). En x₀ = 0 la
+tangente est horizontale : la méthode échoue.
+
+### TP 44 — Inégalités de convexité
+
+*Niveau : Terminale · Durée : 30 min*
+
+**Mise en place.** Ordre de Taylor 1 : `exp(x)` avec x₀ = 0, `log(x)`
+avec x₀ = 1 (x min = 0,05), `sin(x)` avec x₀ = 0 sur [0, π].
+
+**Questions.** Comparer chaque courbe à sa tangente. En déduire trois
+inégalités. Déplacer x₀ : la position relative change-t-elle ?
+
+**Éléments de réponse.** eˣ ≥ 1 + x (convexe, au-dessus de toutes ses
+tangentes) ; ln x ≤ x − 1 (concave, en dessous) ; sin x ≤ x pour
+x ≥ 0. Pour une fonction convexe, la position reste la même quel que
+soit x₀.
+
+### TP 45 — Majorer l'erreur de Taylor
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Preset **« Taylor sin(x) : approximations
+successives »**. Le panneau affiche le polynôme de chaque ordre.
+
+**Questions.**
+
+1. Calculer T₁(1), T₃(1), T₅(1) et comparer à sin 1 ≈ 0,841471.
+2. Comparer chaque erreur à la majoration de Taylor-Lagrange
+   |x|ⁿ⁺¹/(n+1)!.
+3. Quel ordre faut-il pour avoir sin 1 à 10⁻⁶ près ?
+
+**Éléments de réponse.** T₁(1) = 1 (erreur 0,159) ;
+T₃(1) = T₄(1) ≈ 0,833333 (erreur 0,0081 ≤ 1/5! ≈ 0,0083) ;
+T₅(1) = T₆(1) ≈ 0,841667 (erreur 0,000196 ≤ 1/7! ≈ 0,000198).
+1/9! ≈ 2,8·10⁻⁶ ne suffit pas encore, 1/11! ≈ 2,5·10⁻⁸ suffit : il
+faut aller jusqu'à x⁹ (T₉ = T₁₀).
+
+### TP 46 — Approcher le nombre e
+
+*Niveau : Terminale · Durée : 20 min*
+
+**Mise en place.** Preset **« Taylor exp(x) : approximations
+successives »** (x₀ = 0, ordres 1 à 5).
+
+**Questions.** Lire le polynôme de chaque ordre et calculer sa valeur en
+x = 1. Vers quel nombre la suite converge-t-elle ? Avec quelle vitesse ?
+
+**Éléments de réponse.** 2 ; 2,5 ; 2,6667 ; 2,7083 ; 2,7167 → e ≈ 2,71828.
+L'erreur après l'ordre n est de l'ordre de 1/(n+1)! : convergence très
+rapide.
+
+## I. Courbes paramétrées (suite)
+
+### TP 47 — La lemniscate : passer deux fois au même point
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Lemniscate de Bernoulli »** ; placer t₀
+en π/2 puis en 3π/2.
+
+**Questions.** Le point M passe deux fois par l'origine. Avec la même
+vitesse ? Quel angle font les deux tangentes ?
+
+**Éléments de réponse.** En t = π/2, v = (−a/2, −a/2) ; en t = 3π/2,
+v = (a/2, −a/2) : les deux tangentes sont perpendiculaires. Un point
+double n'a pas « une » tangente.
+
+### TP 48 — La spirale logarithmique : un angle constant
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Spirale logarithmique amortie »**
+(paramètre k = 3) ; vecteurs position et vitesse affichés ; faire
+glisser t₀.
+
+**Questions.** L'angle entre OM et la vitesse change-t-il ? Le calculer.
+Que devient-il quand k augmente ?
+
+**Éléments de réponse.** cos α = −1/√(k² + 1), constant : environ 108°
+pour k = 3. Quand k → ∞, α → 90° (on tend vers le cercle).
+
+### TP 49 — Courbes tracées sur une surface
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Presets **« Courbe de Viviani (intersection sphère /
+cylindre) »** et **« Hélice conique »**.
+
+**Questions.**
+
+1. Viviani : F(t) = R(1 + cos t, sin t, 2 sin(t/2)). Calculer ‖F(t)‖.
+   Sur quelle sphère est la courbe ? Sur quel cylindre ?
+2. Hélice conique : montrer que z / √(x² + y²) est constant. Sur quelle
+   surface est la courbe ?
+
+**Éléments de réponse.** ‖F‖ = 2R : sphère de centre O et de rayon 2R ;
+(x − R)² + y² = R² : cylindre. Hélice conique : z/√(x²+y²) = b/a, la
+courbe est tracée sur un cône de sommet O.
+
+### TP 50 — Compter les pointes
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Presets **« Épicycloïde (k=5) »**, **« Deltoïde »**,
+**« Astroïde »**, **« Cardioïde »**.
+
+**Questions.** Prévoir le nombre de pointes, puis compter. Pour
+l'épicycloïde (1,2 cos t − 0,2 cos 6t, 1,2 sin t − 0,2 sin 6t), résoudre
+v(t) = 0.
+
+**Éléments de réponse.** v = 0 ⇔ 6t ≡ t (mod 2π) ⇔ t = 2kπ/5 :
+5 pointes. Deltoïde 3, astroïde 4, cardioïde 1.
+
+### TP 51 — Longueur d'une courbe
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Presets **« Astroïde : (cos³t, sin³t) »** et
+**« Cycloïde : roue qui roule »** (R = 1). Observer ‖v‖ en faisant
+glisser t₀.
+
+**Questions.** Exprimer ‖v(t)‖, puis la longueur L = ∫ ‖v(t)‖ dt sur une
+période (astroïde) ou une arche (cycloïde).
+
+**Éléments de réponse.** Astroïde : ‖v‖ = 3|sin t cos t|, L = 6.
+Cycloïde : ‖v‖ = 2R|sin(t/2)|, une arche mesure 8R.
+
+### TP 52 — Rayon de courbure
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Créer la courbe vectorielle
+`2*cos(t)*N.x + sin(t)*N.y + 0*N.z` ; placer t₀ en 0 puis en π/2.
+
+**Questions.** Calculer le rayon de courbure ρ = ‖v‖³ / ‖v × a‖ aux
+sommets de l'ellipse. Où l'ellipse est-elle la plus « pointue » ?
+
+**Éléments de réponse.** En t = 0, ρ = 1/2 ; en t = π/2, ρ = 4. La
+courbure est maximale aux extrémités du grand axe.
+
+## J. Mouvement animé (suite) — panneau 2
+
+### TP 53 — Tir parabolique animé
+
+*Niveau : 1re–Terminale / physique · Durée : 30 min*
+
+**Mise en place.** Presets **« Rectiligne uniformément accéléré »** puis
+**« Tir parabolique (g=1) »** (x = t, z = 2t − t²/2). Mettre la
+lecture en pause à différents instants.
+
+**Questions.** À quel instant le projectile est-il au sommet ? Où
+retombe-t-il ? Comment évoluent les composantes de v ?
+
+**Éléments de réponse.** Sommet à t = 2, en (2, 0, 2) ; retour au sol
+à t = 4, en x = 4. vₓ = 1 constante, v_z = 2 − t décroît
+linéairement ; a = (0, 0, −1).
+
+### TP 54 — Vérifier une affirmation : la rosace
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Rosace polaire (3 pétales) »**. Avant de
+lire la note, demander aux élèves : « la vitesse s'annule-t-elle à la
+pointe des pétales ? à l'origine ? »
+
+**Questions.** Calculer ‖v‖² pour r = cos 3θ. Le point s'arrête-t-il
+quelque part ?
+
+**Éléments de réponse.** ‖v‖² = r'² + r² = 9 sin²3t + cos²3t ≥ 1 : la
+vitesse ne s'annule jamais. À l'origine ‖v‖ = 3 (le point y passe
+vite) ; à la pointe des pétales ‖v‖ = 1. Pas de rebroussement.
+
+### TP 55 — Même trajectoire, autre loi horaire
+
+*Niveau : Terminale–Supérieur · Durée : 45 min*
+
+**Mise en place.** Taper successivement dans le panneau 2 :
+(`cos(t)`, `sin(t)`, `0`), (`cos(t**2/2)`, `sin(t**2/2)`, `0`),
+(`cos(sin(t))`, `sin(sin(t))`, `0`).
+
+**Questions.** Les trois trajectoires sont-elles les mêmes ? Comment
+diffèrent les mouvements ? Dans le troisième cas, le point fait-il le
+tour du cercle ?
+
+**Éléments de réponse.** Tous sur le cercle unité, mais : vitesse
+constante ; vitesse croissante (accélération tangentielle) ; va-et-vient
+sur l'arc d'angle [−1, 1] rad. La trajectoire ne suffit pas à décrire
+un mouvement.
+
+### TP 56 — Oscillateur amorti
+
+*Niveau : Supérieur / physique · Durée : 30 min*
+
+**Mise en place.** Panneau 1, courbe vectorielle, preset **« Oscillateur
+harmonique amorti (réponse libre) »** (x = e^(−γt) cos(ωt), γ = 0,3,
+ω = 3), puis **« Animer ce mouvement (r, v, a) »**.
+
+**Questions.** Mesurer la durée entre deux maximums de x. Calculer le
+rapport de deux maximums successifs. Que se passe-t-il si γ augmente ?
+
+**Éléments de réponse.** Pseudo-période 2π/ω ≈ 2,09 ; rapport
+e^(−2πγ/ω) ≈ 0,53 (décrément logarithmique 2πγ/ω ≈ 0,63). L'amplitude
+décroît plus vite quand γ augmente.
+
+## K. Fonctions de deux variables (suite)
+
+### TP 57 — Le cône : pas de plan tangent au sommet
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Cône z = √(x²+y²) »** ; plan tangent
+affiché ; approcher (x₀, y₀) de (0, 0) par différents côtés.
+
+**Questions.** Comment se comporte le plan tangent près du sommet ?
+Calculer ‖∇f‖. f est-elle différentiable en (0, 0) ?
+
+**Éléments de réponse.** ∇f = (x, y)/r, de norme 1 partout sauf en 0.
+Le plan tangent change brutalement selon la direction d'approche :
+pas de plan tangent en (0, 0), f n'y est pas différentiable.
+
+### TP 58 — Le chapeau mexicain : un cercle de minimums
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Chapeau mexicain z = ((x²+y²)² −
+4(x²+y²))/8 »** ; plan tangent affiché.
+
+**Questions.** Trouver les points où le plan tangent est horizontal.
+Combien y a-t-il de minimums ?
+
+**Éléments de réponse.** En posant ρ = x² + y² : z = (ρ² − 4ρ)/8,
+minimal pour ρ = 2. Tout le cercle de rayon √2 est formé de minimums
+(z = −1/2) ; maximum local en 0 (z = 0).
+
+### TP 59 — Trouver tous les points critiques
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Presets **« Bosse dipolaire z = x·exp(-(x²+y²)) »**
+et **« Quadrupôle gaussien z = x·y·exp(-(x²+y²)/2) »**.
+
+**Questions.** Résoudre ∇f = 0, puis vérifier chaque point à l'écran en
+y plaçant (x₀, y₀). Préciser la nature (minimum, maximum, col).
+
+**Éléments de réponse.** Bosse : maximum en (1/√2, 0), minimum en
+(−1/√2, 0), valeurs ±e^(−1/2)/√2 ≈ ±0,43. Quadrupôle : col en (0, 0),
+maximums en (1, 1) et (−1, −1), minimums en (1, −1) et (−1, 1),
+valeurs ±1/e ≈ ±0,37.
+
+### TP 60 — Onde plane et direction de plus grande pente
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Preset **« Hauteur ondulée z = sin(a·x + b·y) »** ;
+faire varier a et b.
+
+**Questions.** Le long de quelles droites la hauteur est-elle constante ?
+Dans quelle direction la pente est-elle la plus forte ? Lien avec le
+gradient ?
+
+**Éléments de réponse.** z est constante sur les droites
+ax + by = constante. ∇f = cos(ax + by)·(a, b) : la plus grande pente est
+dans la direction (a, b), perpendiculaire aux crêtes.
+
+### TP 61 — Surfaces de révolution et surfaces réglées
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** Presets **« Vase de révolution sinusoïdal »**,
+**« Cône de révolution »**, **« Cylindre R·(cos v, sin v, u) »**,
+**« Hélicoïde droit »**, **« Conoïde de Plücker »**,
+**« Pseudosphère (tractricoïde) »**.
+
+**Questions.** Lesquelles sont de révolution ? Lesquelles contiennent des
+droites (surfaces réglées) ? Pour une surface de révolution, retrouver
+la courbe génératrice.
+
+**Éléments de réponse.** Révolution : vase, cône, cylindre,
+pseudosphère (génératrice : la tractrice du TP 19). Réglées : cône,
+cylindre, hélicoïde, conoïde de Plücker.
+
+## L. Champs (suite)
+
+### TP 62 — Fonctions harmoniques et équation de Laplace
+
+*Niveau : Supérieur · Durée : 45 min*
+
+**Mise en place.** « Créer un champ de vecteurs… », mode **« Gradient d'un
+potentiel ϕ(x,y,z) »**. Essayer ϕ = `x**2 + y**2 - 2*z**2`,
+`(2*z**2 - x**2 - y**2)/2`, `x**2 + y**2 + z**2`, `x*y*z`,
+`1/sqrt(x**2 + y**2 + z**2)`. Le panneau affiche la divergence ∇·V.
+
+**Questions.** Pourquoi ∇·(∇ϕ) = Δϕ ? Quelles fonctions ϕ sont
+harmoniques (Δϕ = 0) ?
+
+**Éléments de réponse.** div grad = Laplacien. Harmoniques :
+x² + y² − 2z², (2z² − x² − y²)/2, xyz, 1/r (hors de l'origine) ;
+pour r², Δϕ = 6.
+
+### TP 63 — Comparer des potentiels
+
+*Niveau : Supérieur / physique · Durée : 30 min*
+
+**Mise en place.** Champ scalaire : presets **« Potentiel coulombien :
+k/r »**, **« Potentiel de Yukawa : exp(-2r)/r »**, **« Potentiel d'un
+dipôle : p·z / r³ »**, **« Dipôle fini »**. Même f min / f max pour
+tous.
+
+**Questions.** Lequel décroît le plus vite avec r ? Le potentiel du
+dipôle a-t-il la symétrie sphérique ? Où est-il nul ?
+
+**Éléments de réponse.** Yukawa décroît exponentiellement, plus vite que
+1/r ; le dipôle décroît en 1/r². Le potentiel du dipôle est nul dans
+le plan z = 0 et change de signe de part et d'autre.
+
+### TP 64 — Champs de Beltrami : rot V colinéaire à V
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Presets **« Écoulement ABC (Arnold–Beltrami–Childress) »**
+et **« Champ de Beltrami plan : V = (cos z, sin z, 0) »**. Lire le
+rotationnel affiché.
+
+**Questions.** Comparer rot V et V dans chaque cas. Que vaut div V ?
+
+**Éléments de réponse.** ABC : rot V = V. Beltrami plan :
+rot V = −V. Les deux ont une divergence nulle.
+
+### TP 65 — Champ hélicoïdal et compression anisotrope
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Presets **« Champ tournant ascendant V = (-y, x, c) »**
+et **« Compression anisotrope : V = (a·x, b·y, c·z) »** ; faire varier
+les curseurs.
+
+**Questions.** Calculer div V et rot V. Pour la compression, quelle
+condition sur a, b, c rend le champ incompressible ? Les valeurs du
+preset la vérifient-elles ?
+
+**Éléments de réponse.** Champ tournant : div 0, rot (0, 0, 2).
+Compression : div V = a + b + c, rot V = 0. Avec a = 1, b = 0,5,
+c = −1,5 : a + b + c = 0, le champ est incompressible.
+
+## M. Calcul vectoriel (suite)
+
+### TP 66 — Réflexion par rapport à un plan
+
+*Niveau : Supérieur · Durée : 30 min*
+
+**Mise en place.** Banc prêt à l'emploi **« Réflexion (plan XY) »**
+(refl = v − 2·proj(v, ê_z)) ; faire varier θ.
+
+**Questions.** La réflexion conserve-t-elle la longueur ? L'angle avec
+le plan ? Écrire la matrice de cette réflexion : que vaut son
+déterminant ?
+
+**Éléments de réponse.** Longueurs et angles conservés ; seule la
+composante normale (selon ê_z) change de signe. Matrice
+diag(1, 1, −1), de déterminant −1 : la réflexion inverse
+l'orientation, contrairement à une rotation.
+
+### TP 67 — Repère tournant
+
+*Niveau : Supérieur · Durée : 20 min*
+
+**Mise en place.** Banc **« Repère orthonormé tournant »** ; faire
+varier θ.
+
+**Questions.** Les vecteurs e1, e2, e3 restent-ils orthogonaux et de
+même norme ? Écrire la matrice de la rotation d'angle θ autour de Oz.
+
+**Éléments de réponse.** Oui, une rotation conserve produit scalaire et
+normes ; matrice [[cos θ, −sin θ, 0], [sin θ, cos θ, 0], [0, 0, 1]].
+
+## N. Changement de référentiel (suite) — panneau 3
+
+### TP 68 — Manège qui accélère
+
+*Niveau : Supérieur / physique · Durée : 30 min*
+
+**Mise en place.** Preset **« Manège uniformément accéléré »**
+(ψ = t²/4, M fixe en (1, 0, 0) dans R').
+
+**Questions.** Décomposer aₑ en une composante tangentielle et une
+composante centripète. Laquelle est constante ?
+
+**Éléments de réponse.** Ω = t/2 : composante tangentielle
+dΩ/dt × O'M de norme 1/2 (constante), composante centripète
+Ω² = t²/4 (croissante).
+
+### TP 69 — Manège qui monte, ascenseur qui tombe
+
+*Niveau : Supérieur / physique · Durée : 30 min*
+
+**Mise en place.** Presets **« Manège tournant + montée verticale »** et
+**« Repère en chute libre tournant »**.
+
+**Questions.** Quelle est la trajectoire de M dans R pour le premier ?
+Dans le second, que vaut l'accélération de O' ?
+
+**Éléments de réponse.** Une hélice. Dans le second, O' a
+l'accélération (0, 0, −1) : c'est la situation de l'ascenseur en chute
+libre (impesanteur). La rotation ajoute à aₑ une composante
+centripète, et Coriolis apparaît dès que M bouge dans R'.
+
+### TP 70 — Coriolis change de signe
+
+*Niveau : Supérieur / physique · Durée : 30 min*
+
+**Mise en place.** Preset **« Masse oscillant radialement sur disque
+tournant »** (r' = (1 + 0,5 cos 2t, 0, 0), ψ = t).
+
+**Questions.** Quand la masse s'éloigne du centre, de quel côté est
+dirigée a_c ? Et quand elle se rapproche ?
+
+**Éléments de réponse.** vᵣ = (−sin 2t, 0, 0) et
+a_c = 2Ω × vᵣ = (0, −2 sin 2t, 0) : a_c change de sens à chaque
+demi-oscillation, toujours perpendiculaire à vᵣ.
+
+## O. Défis
+
+Sujets ouverts pour les élèves rapides, un devoir maison ou une
+évaluation. Chaque défi se vérifie à l'écran.
+
+1. Trouver une fonction dont la tangente en x = 1 est la droite
+   y = 2x − 1, puis une autre.
+2. Trouver une fonction dont les courbes f et f' se coupent exactement
+   en x = 0.
+3. Trouver un polynôme de degré 3 ayant un maximum en −1 et un minimum
+   en 2.
+4. Créer une courbe F(t) dont la vitesse s'annule exactement trois fois
+   sur [0, 2π].
+5. Créer un mouvement circulaire dont la vitesse double toutes les
+   2 secondes.
+6. Trouver une surface z = f(x, y) qui a deux minimums et un col.
+7. Trouver un champ de vecteurs de divergence nulle et de rotationnel
+   non nul, puis un champ de divergence non nulle et de rotationnel nul.
+8. Trouver un potentiel ϕ, non constant et différent de ceux du TP 62,
+   tel que Δϕ = 0.
+9. Construire un mouvement dans R' qui donne une trajectoire rectiligne
+   dans R alors que R' tourne.
+10. Trouver une fonction dont le polynôme de Taylor d'ordre 3 en 0 est
+    1 + x + x²/2 + x³/6, mais qui n'est pas eˣ.
+
 # Pour aller plus loin
 
 - **Projets d'élèves** : chaque groupe choisit une courbe ou une surface,
@@ -778,6 +1342,6 @@ sol. Gyroscope : Ω change de norme et de direction.
   captures d'écran.
 - **Créer ses propres presets** : un élève prépare un exemple, le
   bouton *Enregistrer* le garde, *Exporter* le partage avec la classe.
-- **Lien avec la physique** : les TP 14 à 24 et 35 à 37 se prêtent à un
-  travail commun mathématiques-physique (cinématique, référentiels non
-  galiléens).
+- **Lien avec la physique** : les TP 14 à 24, 35 à 37, 53 à 56 et
+  68 à 70 se prêtent à un travail commun mathématiques-physique
+  (cinématique, oscillateurs, référentiels non galiléens).

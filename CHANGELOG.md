@@ -26,6 +26,11 @@ dans la console. Les presets personnels de Vector Viewer sont conservés
   parcourue au cours du temps, avec ses vecteurs vitesse et accélération.
   Les paramètres libres (R, ω…) y prennent la valeur des sliders.
 - Une seule copie de SymPy et de la couche de compatibilité Blender 5.2.
+- Notes « À observer » corrigées (vérifiées avec SymPy) : *Rosace* (v ne
+  s'annule jamais, ‖v‖ ≥ 1), *Spirale d'Archimède* (‖a‖ = √(4+t²), croissance
+  linéaire), *Hélice* (v ⟂ a à chaque instant), *Orbite elliptique* (a pointe
+  vers le centre, pas vers un foyer).
+- Guide enseignant : 70 TP et 10 défis, en Markdown et en PDF.
 
 
 # Vector Viewer

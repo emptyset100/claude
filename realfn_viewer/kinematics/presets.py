@@ -88,8 +88,8 @@ PRESETS = {
     "HELICE": {
         "label":    "Hélice circulaire",
         "tip":      "Cercle de rayon 1 dans (x,y) + montée régulière en z. "
-                    "v et a constants en module, v jamais perpendiculaire "
-                    "au plan de a.",
+                    "v et a constants en module ; v ⟂ a à chaque instant "
+                    "(‖v‖ constante), a horizontale dirigée vers l'axe.",
         "x":        "cos(t)",
         "y":        "sin(t)",
         "z":        "t/(2*pi)",
@@ -100,8 +100,8 @@ PRESETS = {
     "SPIRALE": {
         "label":    "Spirale d'Archimède",
         "tip":      "r = t en coordonnées polaires : x = t·cos(t), "
-                    "y = t·sin(t). v et a non bornés, croissance "
-                    "linéaire/quadratique.",
+                    "y = t·sin(t). v et a non bornés, à croissance "
+                    "linéaire : ‖v‖ = √(1+t²), ‖a‖ = √(4+t²).",
         "x":        "t*cos(t)",
         "y":        "t*sin(t)",
         "z":        "0",
@@ -176,8 +176,9 @@ PRESETS = {
         "label":    "Orbite elliptique (Kepler simplifié)",
         "tip":      "Ellipse paramétrée x = 2cos(t), y = sin(t), z = 0. "
                     "Paramétrage uniforme (NON conforme à la 2e loi de "
-                    "Kepler), mais visualise bien a centripète variable "
-                    "selon la distance au foyer.",
+                    "Kepler) : ici a = −OM pointe vers le CENTRE de "
+                    "l'ellipse, pas vers un foyer — c'est un oscillateur "
+                    "harmonique 2D, pas une orbite de planète.",
         "x":        "2*cos(t)",
         "y":        "sin(t)",
         "z":        "0",
@@ -188,8 +189,9 @@ PRESETS = {
     "ROSE_3PETALES": {
         "label":    "Rosace polaire (3 pétales)",
         "tip":      "r(θ) = cos(3θ) en coordonnées polaires : "
-                    "x = cos(3t)·cos(t), y = cos(3t)·sin(t). v et a "
-                    "passent par zéro aux pointes des pétales.",
+                    "x = cos(3t)·cos(t), y = cos(3t)·sin(t). v ne "
+                    "s'annule jamais (‖v‖² = 9 sin²3t + cos²3t ≥ 1) : "
+                    "pas de rebroussement, M repasse par O avec ‖v‖ = 3.",
         "x":        "cos(3*t)*cos(t)",
         "y":        "cos(3*t)*sin(t)",
         "z":        "0",

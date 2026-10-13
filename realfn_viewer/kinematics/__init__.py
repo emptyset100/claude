@@ -1,7 +1,7 @@
-"""Vector Viewer — extension Blender pour la visualisation animée
-de vecteurs cinématiques.
+"""Cinématique animée (ex-extension « Vector Viewer », intégrée à RealFn
+Viewer depuis la 6.0) — visualisation animée de vecteurs cinématiques.
 
-Deux panneaux dans la N-zone de la 3D View, onglet « Vector Viewer » :
+Deux panneaux dans la N-zone de la 3D View, onglet « Maths » :
 
 1. Vector Viewer (simple)
    Saisie de x(t), y(t), z(t) → trois flèches chaînées r/v/a depuis
@@ -28,8 +28,9 @@ from . import (
     composition_properties, composition_operators, composition_panel,
     composition_presets as _cmp_presets,
     materials_presets as _mat_presets,
-    materials_panel, modifier_inputs,
+    materials_panel,
 )
+from .. import modifier_inputs
 
 
 classes = (

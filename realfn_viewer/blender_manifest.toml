@@ -1,13 +1,13 @@
 schema_version = "1.0.0"
 
 id = "realfn_viewer"
-version = "5.6.0"
+version = "6.0.0"
 name = "RealFn Viewer"
-tagline = "Fonctions scalaires y=f(x) et vectorielles F(t) à valeurs dans R³"
+tagline = "Fonctions, courbes, surfaces, champs et cinématique animée"
 maintainer = "Empty"
 type = "add-on"
 
-tags = ["3D View", "Geometry Nodes", "Math Vis"]
+tags = ["3D View", "Geometry Nodes", "Math Vis", "Animation"]
 
 # SymPy 1.14 needs Python 3.9+. The geometry uses the post-4.0
 # Geometry Nodes interface API and FunctionNodeAlignRotationToVector

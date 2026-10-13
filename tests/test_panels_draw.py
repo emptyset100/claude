@@ -9,6 +9,7 @@ import bpy, addon_utils
 repo = bpy.utils.user_resource("EXTENSIONS", path="user_default", create=True)
 shutil.copytree(SRC, os.path.join(repo, "realfn_viewer"), ignore=shutil.ignore_patterns("__pycache__"))
 PKG = "bl_ext.user_default.realfn_viewer"
+bpy.context.preferences.filepaths.use_scripts_auto_execute = True
 mod_addon = addon_utils.enable(PKG, default_set=True)
 mod_addon._auto_install_builtins()
 m = lambda n: importlib.import_module(PKG + "." + n)
@@ -126,7 +127,9 @@ class FakeSelf:
 
 
 def draw_all(tag):
-    panels = [c for c in list(m("panel").classes) + [m("materials_panel").REALFN_MAT_PT_panel]]
+    kin = m("kinematics")
+    panels = ([c for c in list(m("panel").classes) + [m("materials_panel").REALFN_MAT_PT_panel]]
+              + [c for c in kin.classes if issubclass(c, bpy.types.Panel)])
     ctx = bpy.context
     n = 0
     for cls in panels:
@@ -147,8 +150,13 @@ def draw_all(tag):
 draw_all("empty scene")
 for op, kw in [("create", {}), ("create_vector", {}), ("create_surface", {}),
                ("create_parametric_surface", {}), ("create_scalar_field_3d", {}),
-               ("create_vector_field_3d", {}), ("create_vector_bench", {})]:
-    getattr(bpy.ops.realfn, op)(**kw)
+               ("create_vector_field_3d", {}), ("create_vector_bench", {}),
+               ("vector_viewer.build", {}), ("vector_comp.build", {})]:
+    if "." in op:
+        cat, name = op.split(".")
+        getattr(getattr(bpy.ops, cat), name)(**kw)
+    else:
+        getattr(bpy.ops.realfn, op)(**kw)
     draw_all(op)
     bpy.context.window_manager.realfn_display_latex = True
     draw_all(op + " latex")

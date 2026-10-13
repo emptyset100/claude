@@ -1,5 +1,33 @@
 # Journal des modifications
 
+# RealFn Viewer 6.0.0 — fusion avec Vector Viewer
+
+Les deux extensions n'en font plus qu'une : **RealFn Viewer** (même
+identifiant `realfn_viewer`, donc mise à jour sur place et presets
+personnels conservés). Vector Viewer devient le sous-paquet
+`kinematics`.
+
+**Avant d'installer la 6.0, désinstallez l'ancienne extension « Vector
+Viewer »** : les deux déclarent les mêmes opérateurs. Si elle est encore
+activée, la partie cinématique ne se charge pas et un message l'indique
+dans la console. Les presets personnels de Vector Viewer sont conservés
+(ils sont rangés dans le dossier de configuration de Blender).
+
+- **Un seul onglet « Maths »** dans la barre latérale (N), avec des
+  panneaux numérotés dans un ordre de progression :
+  1 · Fonctions, courbes, surfaces, champs — 2 · Mouvement : r, v, a
+  animés — 3 · Changement de référentiel — Couleurs (palettes).
+- **Note « À observer »** sous le menu des presets de cinématique :
+  chaque preset y explique ce qu'il faut regarder (ex. MCU : « v
+  tangente unitaire, a centripète unitaire »). Ces textes existaient
+  dans les presets mais n'étaient jamais affichés.
+- **Nouveau bouton « Animer ce mouvement (r, v, a) »** sur une courbe
+  F(t) du panneau 1 : la même trajectoire est envoyée au panneau 2 et
+  parcourue au cours du temps, avec ses vecteurs vitesse et accélération.
+  Les paramètres libres (R, ω…) y prennent la valeur des sliders.
+- Une seule copie de SymPy et de la couche de compatibilité Blender 5.2.
+
+
 # Vector Viewer
 
 ## 1.1.0 — Adaptation à Blender 5.2.2 LTS

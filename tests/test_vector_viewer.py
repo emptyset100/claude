@@ -1,6 +1,7 @@
 """Headless test of the Vector Viewer extension against the bpy module.
 
-Usage: python -I tests/test_vector_viewer.py vector_viewer
+Usage: python -I tests/test_vector_viewer.py realfn_viewer
+(kinematics sub-package of RealFn Viewer, ex-Vector Viewer)
 
 For every built-in preset of both panels (simple r/v/a and composition):
 apply + build, then check that
@@ -24,15 +25,17 @@ import addon_utils  # noqa: E402
 
 print("Blender", bpy.app.version_string)
 repo = bpy.utils.user_resource("EXTENSIONS", path="user_default", create=True)
-shutil.copytree(SRC, os.path.join(repo, "vector_viewer"),
+shutil.copytree(SRC, os.path.join(repo, "realfn_viewer"),
                 ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-PKG = "bl_ext.user_default.vector_viewer"
+PKG = "bl_ext.user_default.realfn_viewer"
 # Python drivers need auto-run.
 bpy.context.preferences.filepaths.use_scripts_auto_execute = True
 mod = addon_utils.enable(PKG, default_set=True,
                          handle_error=lambda e: traceback.print_exc())
 assert mod is not None, "enable failed"
-m = lambda name: importlib.import_module(PKG + "." + name)  # noqa: E731
+m = lambda name: importlib.import_module(PKG + ".kinematics." + name)  # noqa: E731
+kin = importlib.import_module(PKG + ".kinematics")
+root = importlib.import_module(PKG)
 
 FAIL = []
 
@@ -155,7 +158,7 @@ def old_driver_paths():
                     t.data_path = f'modifiers["{md.name}"]["{ident}"]'
                     n += 1
     assert n, "no modifier-reading driver variables found"
-    mod._upgrade_driver_paths()
+    kin._upgrade_driver_paths()
     return drivers_ok(md)
 
 
@@ -163,6 +166,26 @@ check("materials", materials)
 if bpy.app.version >= (5, 2, 0):
     check("upgrade pre-5.2 driver paths", old_driver_paths)
 blend = os.path.join(os.environ["BLENDER_USER_RESOURCES"], "t.blend")
+
+
+def bridge():
+    """RealFn F(t) curve -> animated r, v, a (with a free parameter)."""
+    bpy.ops.realfn.create_vector(expr="R*cos(t)*N.x + R*sin(t)*N.y + 0*N.z",
+                                 allowed_params="R")
+    ob = bpy.context.view_layer.objects.active
+    md = [x for x in ob.modifiers if x.type == "NODES"][0]
+    mi = importlib.import_module(PKG + ".modifier_inputs")
+    ident = [it.identifier for it in md.node_group.interface.items_tree
+             if getattr(it, "in_out", None) == "INPUT" and it.name == "R"][0]
+    mi.set_value(md, ident, 2.0)
+    r = bpy.ops.realfn.send_to_kinematics()
+    props = scene.vector_viewer
+    assert props.x_expr.replace(" ", "") in ("2.0*cos(t)", "2*cos(t)"), props.x_expr
+    _, _, hi = bbox(host(props)[0])
+    return (r, props.x_expr, props.y_expr, props.z_expr)
+
+
+check("RealFn F(t) -> animated r, v, a", bridge)
 check("save", lambda: bpy.ops.wm.save_as_mainfile(filepath=blend))
 check("reload + drivers", lambda: (bpy.ops.wm.open_mainfile(filepath=blend),
                                     drivers_ok(host(bpy.context.scene.vector_viewer)[1]))[1])

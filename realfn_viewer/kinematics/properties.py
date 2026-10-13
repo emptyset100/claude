@@ -23,7 +23,7 @@ from .nodegroups import (
     SCALE_A_SOCKET,
 )
 from . import presets as _presets
-from . import modifier_inputs
+from .. import modifier_inputs
 
 
 # Nom du modifier porté par l'objet hôte. Constante partagée avec

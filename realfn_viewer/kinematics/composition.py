@@ -25,12 +25,12 @@ try:
     import sympy as sp
 except ImportError as e:  # pragma: no cover
     raise ImportError(
-        "L'extension Vector Viewer nécessite sympy. Installez-le dans "
-        "le Python de Blender :\n"
-        "    <BLENDER_PYTHON> -m pip install sympy"
+        "SymPy est introuvable alors qu'il est fourni avec l'extension "
+        "RealFn Viewer : réinstallez l'extension depuis son fichier .zip."
     ) from e
 
-from . import _parse_helpers, modifier_inputs
+from . import _parse_helpers
+from .. import modifier_inputs
 
 # Réexports pour rétrocompat avec d'éventuels imports antérieurs.
 T = _parse_helpers.T

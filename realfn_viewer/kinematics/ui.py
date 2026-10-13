@@ -3,15 +3,16 @@
 import bpy
 from bpy.types import Panel
 
-from . import preset_storage
+from . import didactic, preset_storage, presets
 
 
 class VECTORVIEWER_PT_panel(Panel):
-    bl_label = "Vector Viewer"
+    bl_label = "2 · Mouvement : r, v, a animés"
+    bl_order = 1
     bl_idname = "VECTORVIEWER_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Vector Viewer"
+    bl_category = "Maths"
 
     def draw(self, context):
         layout = self.layout
@@ -26,6 +27,7 @@ class VECTORVIEWER_PT_panel(Panel):
             "vector_viewer.apply_preset", text="Appliquer", icon='IMPORT',
         )
         op.preset_id = ""  # → l'opérateur lit props.preset_choice
+        didactic.draw_tip(box, presets.STORE, props.preset_choice)
 
         # Ligne d'actions sur les presets utilisateur
         row = box.row(align=True)

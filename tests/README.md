@@ -17,12 +17,13 @@ python3.13 -m venv .venv
 .venv/bin/python -I tests/test_panels_draw.py realfn_viewer
 ```
 
-Vector Viewer :
+Cinématique animée (ex-Vector Viewer, sous-paquet `kinematics`) :
 
 ```bash
-.venv/bin/python -I tests/test_vector_viewer.py vector_viewer          # tous les presets, drivers, sliders
-.venv/bin/python -I tests/test_vector_viewer_panels.py vector_viewer   # dessin des panneaux
+.venv/bin/python -I tests/test_vector_viewer.py realfn_viewer   # presets, drivers, sliders, pont F(t) → r, v, a
 ```
+
+`test_panels_draw.py` couvre aussi les panneaux de cinématique.
 
 Limite connue : en mode headless, `depsgraph_update_post` n'est jamais
 appelé ; le test de synchronisation de x₀ appelle donc le handler

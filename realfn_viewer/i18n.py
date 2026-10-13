@@ -202,6 +202,10 @@ def schedule_apply_language():
 _CATALOG = {
     # ---- Main panel & creation buttons --------------------------------
     "RealFn Viewer": "RealFn Viewer",
+    "1 · Fonctions, courbes, surfaces, champs":
+        "1 · Functions, curves, surfaces, fields",
+    "Couleurs (palettes)": "Colours (palettes)",
+    "Animer ce mouvement (r, v, a)": "Animate this motion (r, v, a)",
     "y = f(x) avec tangente animée": "y = f(x) with animated tangent",
     # Collapsible creation group headers + active-object display section
     "Courbes": "Curves",

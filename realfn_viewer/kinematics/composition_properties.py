@@ -9,7 +9,7 @@ from bpy.props import (
 from bpy.types import PropertyGroup
 
 from . import composition_presets as _cmp_presets
-from . import modifier_inputs
+from .. import modifier_inputs
 
 
 # Modifier porté par l'objet hôte de composition (différent de l'hôte

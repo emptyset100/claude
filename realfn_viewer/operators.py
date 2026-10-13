@@ -2357,10 +2357,76 @@ class REALFN_OT_clear_basepoint_animation(bpy.types.Operator):
         return {"CANCELLED"}
 
 
+class REALFN_OT_send_to_kinematics(bpy.types.Operator):
+    """Envoie la courbe F(t) active vers le panneau « Mouvement : r, v, a
+    animés » : la même trajectoire, mais parcourue au cours du temps."""
+
+    bl_idname = "realfn.send_to_kinematics"
+    bl_label = "Animer ce mouvement (r, v, a)"
+    bl_description = (
+        "Recopie x(t), y(t), z(t) de la courbe active — paramètres "
+        "remplacés par leurs valeurs actuelles — dans le panneau "
+        "« 2 · Mouvement », puis lance l'animation : on voit le point "
+        "parcourir la trajectoire avec ses vecteurs vitesse et "
+        "accélération"
+    )
+    bl_options = {"REGISTER", "UNDO"}
+
+    @classmethod
+    def poll(cls, context):
+        return (_active_vector_realfn_modifier(context) is not None
+                and hasattr(context.scene, "vector_viewer"))
+
+    def execute(self, context):
+        mod = _active_vector_realfn_modifier(context)
+        nt = mod.node_group
+        comps = list(nt.get("realfn_components_text") or [])
+        if len(comps) != 3:
+            self.report({"ERROR"}, "Composantes de F(t) introuvables")
+            return {"CANCELLED"}
+        import sympy as sp
+        var = sp.Symbol(str(nt.get("realfn_var", "t")), real=True)
+        t = sp.Symbol("t", real=True)
+
+        def socket_value(name, default):
+            ident = _socket_identifier(nt, name)
+            value = (modifier_inputs.get_value(mod, ident)
+                     if ident else None)
+            return default if value is None else float(value)
+
+        # Free parameters (a, ω, …) take the slider values the student
+        # is looking at right now.
+        subs = {sp.Symbol(p, real=True): socket_value(p, 1.0)
+                for p in (nt.get("realfn_params") or [])}
+        subs[var] = t
+        try:
+            exprs = [sp.sympify(c, locals={str(k): k for k in subs})
+                     .xreplace(subs) for c in comps]
+        except (sp.SympifyError, TypeError) as exc:
+            self.report({"ERROR"}, f"Conversion impossible : {exc}")
+            return {"CANCELLED"}
+
+        t_min = socket_value("t min", 0.0)
+        t_max = socket_value("t max", 6.283)
+        props = context.scene.vector_viewer
+        props.x_expr, props.y_expr, props.z_expr = (
+            sp.sstr(e) for e in exprs)
+        props.t_start = t_min
+        props.t_duration = max(t_max - t_min, 1e-3)
+        result = bpy.ops.vector_viewer.build()
+        if "FINISHED" not in result:
+            return {"CANCELLED"}
+        context.scene.frame_set(context.scene.frame_start)
+        self.report({"INFO"},
+                    "Mouvement animé créé : lancez la lecture (Espace)")
+        return {"FINISHED"}
+
+
 classes = (
     REALFN_OT_toggle_language,
     REALFN_OT_animate_basepoint,
     REALFN_OT_clear_basepoint_animation,
+    REALFN_OT_send_to_kinematics,
     REALFN_OT_create,
     REALFN_OT_edit,
     REALFN_OT_visible_all_on,

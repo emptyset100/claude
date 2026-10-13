@@ -15,11 +15,12 @@ from . import preset_storage
 
 
 class VECTORVIEWER_MAT_PT_panel(Panel):
-    bl_label = "Matériaux (Palettes)"
+    bl_label = "Couleurs des flèches animées (2 · et 3 ·)"
+    bl_parent_id = "REALFN_MAT_PT_panel"
     bl_idname = "VECTORVIEWER_MAT_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "Vector Viewer"
+    bl_category = "Maths"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):

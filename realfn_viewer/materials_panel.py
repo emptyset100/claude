@@ -15,11 +15,12 @@ from . import materials_presets
 
 
 class REALFN_MAT_PT_panel(Panel):
-    bl_label = "Matériaux (Palettes)"
+    bl_label = "Couleurs (palettes)"
+    bl_order = 3
     bl_idname = "REALFN_MAT_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):

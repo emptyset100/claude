@@ -41,7 +41,7 @@ blocked at parse time.
 
 from __future__ import annotations
 
-__version__ = "5.6.0"
+__version__ = "6.0.0"
 
 import bpy
 
@@ -49,6 +49,17 @@ from . import (bench_props, builtin_presets, edit_props, i18n, memorize,
                operators, panel, sync,
                materials_presets as _mat_presets,
                materials_panel)
+from . import kinematics
+
+_KINEMATICS_ON = [False]
+
+
+def _standalone_vector_viewer_enabled() -> bool:
+    """The former standalone *Vector Viewer* extension registers the same
+    classes and scene properties as :mod:`kinematics`; both cannot be
+    enabled at once."""
+    return any(name == "vector_viewer" or name.endswith(".vector_viewer")
+               for name in bpy.context.preferences.addons.keys())
 
 
 # Display preferences live on the WindowManager (a "scratch" datablock
@@ -233,6 +244,15 @@ def register():
     bpy.types.Scene.realfn_materials = bpy.props.PointerProperty(
         type=_mat_presets.RealFnMaterialsProperties
     )
+    # Animated kinematics (ex-Vector Viewer). Registered after the
+    # colours panel, which parents its own palette sub-panel.
+    if _standalone_vector_viewer_enabled():
+        print("[RealFn] L'ancienne extension « Vector Viewer » est "
+              "activée : désactivez-la (elle est désormais incluse), "
+              "puis réactivez RealFn Viewer.")
+    else:
+        kinematics.register()
+        _KINEMATICS_ON[0] = True
     bench_props.register()
     edit_props.register()
     _register_display_props()
@@ -258,6 +278,9 @@ def register():
 
 def unregister():
     # Tear down in reverse order of register().
+    if _KINEMATICS_ON[0]:
+        kinematics.unregister()
+        _KINEMATICS_ON[0] = False
     memorize.unregister()
     sync.unregister()
     _unregister_display_props()

@@ -5,7 +5,8 @@ import re
 import unicodedata
 
 import bpy
-from . import math_core, modifier_inputs, nodegroups
+from . import math_core, nodegroups
+from .. import modifier_inputs
 from .properties import MODIFIER_NAME as _MODIFIER_NAME
 
 

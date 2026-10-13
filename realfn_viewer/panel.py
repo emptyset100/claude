@@ -521,11 +521,12 @@ def _draw_auto_row(box, props, rebuild_op):
 
 
 class REALFN_PT_main(bpy.types.Panel):
-    bl_label = "RealFn Viewer"
+    bl_label = "1 · Fonctions, courbes, surfaces, champs"
+    bl_order = 0
     bl_idname = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
 
     def _draw_create_groups(self, layout):
         """Draw the three collapsible 'Créer…' sections.
@@ -802,7 +803,7 @@ class REALFN_PT_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -892,7 +893,7 @@ class REALFN_PT_vector_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -919,6 +920,13 @@ class REALFN_PT_vector_params(bpy.types.Panel):
               "Show acceleration vector", "Material · position",
               "Material · vitesse", "Material · accélération"], True),
         ])
+
+        # ---- 1ter. Bridge to the animated kinematics panel ----------
+        # Same trajectory, now travelled in time: the static curve
+        # becomes a moving point with its live v and a arrows.
+        layout.operator("realfn.send_to_kinematics",
+                        text=i18n.tr("Animer ce mouvement (r, v, a)"),
+                        icon="PLAY")
 
         # ---- 1bis. Material shortcuts -----------------------------
         # Two convenience buttons related to the per-piece material
@@ -1005,7 +1013,7 @@ class REALFN_PT_surface_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -1072,7 +1080,7 @@ class REALFN_PT_parametric_surface_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -1218,7 +1226,7 @@ class REALFN_PT_scalar_field_3d_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -1302,7 +1310,7 @@ class REALFN_PT_vector_field_3d_params(bpy.types.Panel):
     bl_parent_id = "REALFN_PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category = "RealFn"
+    bl_category = "Maths"
     bl_options = {"DEFAULT_CLOSED"}
 
     @classmethod
@@ -1515,7 +1523,7 @@ def build_preset_panels():
             "bl_parent_id": "REALFN_PT_main",
             "bl_space_type": "VIEW_3D",
             "bl_region_type": "UI",
-            "bl_category": "RealFn",
+            "bl_category": "Maths",
             "bl_options": {"DEFAULT_CLOSED"},
             "draw": draw,
         }))

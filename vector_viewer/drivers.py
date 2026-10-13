@@ -5,7 +5,7 @@ import re
 import unicodedata
 
 import bpy
-from . import math_core, nodegroups
+from . import math_core, modifier_inputs, nodegroups
 from .properties import MODIFIER_NAME as _MODIFIER_NAME
 
 
@@ -75,7 +75,13 @@ def _add_modifier_var(driver, var_name, host_name, socket_id):
     target = var.targets[0]
     target.id_type = 'OBJECT'
     target.id = bpy.data.objects.get(host_name)
-    target.data_path = f'modifiers["{_MODIFIER_NAME}"]["{socket_id}"]'
+    mod = target.id.modifiers.get(_MODIFIER_NAME) if target.id else None
+    if mod is not None:
+        # Blender 5.2 : ``…properties.inputs.Socket_N.value`` ; avant :
+        # ``…["Socket_N"]`` (voir modifier_inputs).
+        target.data_path = modifier_inputs.input_data_path(mod, socket_id)
+    else:
+        target.data_path = f'modifiers["{_MODIFIER_NAME}"]["{socket_id}"]'
 
 
 def attach_socket_drivers(wrapper_tree, *, fps, t0, host_name, scene=None,
@@ -120,11 +126,9 @@ def attach_socket_drivers(wrapper_tree, *, fps, t0, host_name, scene=None,
     obj = bpy.data.objects.get(host_name)
     if obj is not None and _MODIFIER_NAME in obj.modifiers:
         mod = obj.modifiers[_MODIFIER_NAME]
-        try:
-            mod[sv_id] = float(scale_v)
-            mod[sa_id] = float(scale_a)
-        except (KeyError, RuntimeError):
-            pass  # le modifier n'expose pas encore ces sockets — recréé au build
+        # No-op si le modifier n'expose pas encore ces sockets.
+        modifier_inputs.set_value(mod, sv_id, float(scale_v))
+        modifier_inputs.set_value(mod, sa_id, float(scale_a))
 
     # Conversion frame Blender → temps physique (en secondes), calée sur
     # frame 0 = t0

@@ -23,6 +23,7 @@ from .nodegroups import (
     SCALE_A_SOCKET,
 )
 from . import presets as _presets
+from . import modifier_inputs
 
 
 # Nom du modifier porté par l'objet hôte. Constante partagée avec
@@ -70,7 +71,8 @@ def _write_socket(props, socket_name, value, *, cast=bool):
     if sid is None:
         return  # socket introuvable (wrapper d'une ancienne version ?)
     try:
-        mod[sid] = cast(value)
+        if not modifier_inputs.set_value(mod, sid, cast(value)):
+            raise ValueError("valeur refusée par le modifier")
         # Force le depsgraph à rejouer le modifier — la simple écriture
         # de la propriété personnalisée ne déclenche pas toujours un
         # redessin immédiat dans la 3D View.

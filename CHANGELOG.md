@@ -1,4 +1,26 @@
-# RealFn Viewer — journal des modifications
+# Journal des modifications
+
+# Vector Viewer
+
+## 1.1.0 — Adaptation à Blender 5.2.2 LTS
+
+Testé avec `bpy==5.2.2` : les 15 presets « simple » et les 14 presets
+« composition » (+ Foucault) se construisent ; les flèches bougent avec le
+temps, chaque driver est valide, les sliders d'échelle agissent en direct ;
+enregistrement / rechargement du .blend OK. Compatible Blender 4.2 → 5.1.
+
+- **Bloquant sous 5.2** : la construction échouait pour tous les presets
+  (`mod["Socket_N"] = …` → `TypeError` sur la nouvelle API des entrées du
+  modifier). Ajout de `modifier_inputs.py` (le même que RealFn Viewer).
+- **Drivers** : les variables qui lisent les sliders « Échelle v / a / Ω »
+  pointent vers le chemin 5.2 (`modifiers["…"].properties.inputs.Socket_N.value`).
+  Les fichiers enregistrés avec une version antérieure sont convertis
+  automatiquement à l'ouverture.
+- **SymPy inclus** (wheels sympy 1.14 + mpmath 1.3) : plus besoin de
+  `pip install sympy` dans le Python de Blender.
+- Matériaux : `Material.use_nodes` n'est plus utilisé à partir de 5.0.
+
+# RealFn Viewer
 
 ## 5.6.0 — Adaptation à Blender 5.2.2 LTS
 

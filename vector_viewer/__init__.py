@@ -28,7 +28,7 @@ from . import (
     composition_properties, composition_operators, composition_panel,
     composition_presets as _cmp_presets,
     materials_presets as _mat_presets,
-    materials_panel,
+    materials_panel, modifier_inputs,
 )
 
 
@@ -81,6 +81,29 @@ classes = (
 # réévaluent.
 # ----------------------------------------------------------------------------
 
+def _upgrade_driver_paths():
+    """Fichiers enregistrés avant Blender 5.2 : les variables de driver
+    lisent les échelles du modifier via ``modifiers["…"]["Socket_N"]``,
+    chemin qui ne se résout plus en 5.2. On les réécrit vers
+    ``…properties.inputs.Socket_N.value``. Sans effet avant 5.2."""
+    n = 0
+    for ng in bpy.data.node_groups:
+        ad = ng.animation_data
+        if ad is None:
+            continue
+        for fc in ad.drivers:
+            for var in fc.driver.variables:
+                for t in var.targets:
+                    new_path = modifier_inputs.upgrade_data_path(
+                        t.id, t.data_path)
+                    if new_path:
+                        t.data_path = new_path
+                        n += 1
+    if n:
+        print(f"[VectorViewer] {n} variable(s) de driver mises à jour "
+              f"pour Blender {bpy.app.version_string}")
+
+
 @persistent
 def _on_load(_dummy):
     """Réinjecte les fonctions {r,v,a}_num et cmp_* dans le
@@ -88,6 +111,10 @@ def _on_load(_dummy):
     crucial : ``bpy.app.driver_namespace`` est globalement vidé à
     l'ouverture du .blend, et plusieurs scènes peuvent coexister avec
     leurs propres viewers."""
+    try:
+        _upgrade_driver_paths()
+    except Exception as e:
+        print(f"[VectorViewer] Mise à jour des drivers échouée : {e}")
     for scene in bpy.data.scenes:
         # Vector Viewer simple
         sprops = getattr(scene, "vector_viewer", None)

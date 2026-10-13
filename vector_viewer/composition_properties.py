@@ -9,6 +9,7 @@ from bpy.props import (
 from bpy.types import PropertyGroup
 
 from . import composition_presets as _cmp_presets
+from . import modifier_inputs
 
 
 # Modifier porté par l'objet hôte de composition (différent de l'hôte
@@ -73,7 +74,8 @@ def _write_socket(props, socket_name, value, *, cast=bool):
     if sid is None:
         return
     try:
-        mod[sid] = cast(value)
+        if not modifier_inputs.set_value(mod, sid, cast(value)):
+            raise ValueError("valeur refusée par le modifier")
         obj = bpy.data.objects.get(props.host_name)
         if obj is not None:
             obj.update_tag()

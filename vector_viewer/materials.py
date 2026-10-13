@@ -94,7 +94,10 @@ DEFAULT_STRENGTH = 2.0
 def _build_emission_material(mat, rgb, strength):
     """Configure le node tree d'un matériau pour qu'il émette la couleur
     ``rgb`` à la force ``strength``."""
-    mat.use_nodes = True
+    # Blender 5.0+ : les matériaux utilisent toujours les nodes et
+    # ``use_nodes`` est obsolète (simple avertissement).
+    if bpy.app.version < (5, 0, 0):
+        mat.use_nodes = True
     nt = mat.node_tree
     nt.nodes.clear()
 
@@ -112,7 +115,9 @@ def _build_emission_material(mat, rgb, strength):
 def _emission_node(mat):
     """Retourne le node ShaderNodeEmission d'un matériau Vector Viewer,
     ou None si introuvable (matériau modifié par l'utilisateur)."""
-    if not mat.use_nodes or mat.node_tree is None:
+    if mat.node_tree is None:
+        return None
+    if bpy.app.version < (5, 0, 0) and not mat.use_nodes:
         return None
     for node in mat.node_tree.nodes:
         if node.type == 'EMISSION':

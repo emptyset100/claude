@@ -30,7 +30,7 @@ except ImportError as e:  # pragma: no cover
         "    <BLENDER_PYTHON> -m pip install sympy"
     ) from e
 
-from . import _parse_helpers
+from . import _parse_helpers, modifier_inputs
 
 # Réexports pour rétrocompat avec d'éventuels imports antérieurs.
 T = _parse_helpers.T
@@ -260,7 +260,13 @@ def _add_modifier_var(driver, var_name, host_obj, modifier_name, socket_id):
     target = var.targets[0]
     target.id_type = 'OBJECT'
     target.id = host_obj
-    target.data_path = f'modifiers["{modifier_name}"]["{socket_id}"]'
+    mod = host_obj.modifiers.get(modifier_name) if host_obj else None
+    if mod is not None:
+        # Blender 5.2 : ``…properties.inputs.Socket_N.value`` ; avant :
+        # ``…["Socket_N"]`` (voir modifier_inputs).
+        target.data_path = modifier_inputs.input_data_path(mod, socket_id)
+    else:
+        target.data_path = f'modifiers["{modifier_name}"]["{socket_id}"]'
 
 
 def attach_socket_drivers(wrapper_tree, *, fps, t0, host_name,
@@ -318,12 +324,10 @@ def attach_socket_drivers(wrapper_tree, *, fps, t0, host_name,
     host_obj = bpy.data.objects.get(host_name)
     if host_obj is not None and modifier_name in host_obj.modifiers:
         mod = host_obj.modifiers[modifier_name]
-        try:
-            mod[sv_id] = float(scale_v)
-            mod[sa_id] = float(scale_a)
-            mod[so_id] = float(scale_omega)
-        except (KeyError, RuntimeError):
-            pass  # le modifier n'expose pas encore ces sockets
+        # No-op si le modifier n'expose pas encore ces sockets.
+        modifier_inputs.set_value(mod, sv_id, float(scale_v))
+        modifier_inputs.set_value(mod, sa_id, float(scale_a))
+        modifier_inputs.set_value(mod, so_id, float(scale_omega))
 
     # ── Helpers d'expression de driver ──────────────────────────────
     def f(name):

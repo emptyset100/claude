@@ -22,6 +22,8 @@ has to care which API the running Blender exposes.
 
 from __future__ import annotations
 
+import re
+
 
 def uses_rna_inputs(mod) -> bool:
     """True on Blender 5.2+ (typed ``mod.properties.inputs`` API)."""
@@ -102,6 +104,27 @@ def input_data_path(mod, identifier) -> str:
     if uses_rna_inputs(mod):
         return f'modifiers["{name}"].properties.inputs.{identifier}.value'
     return f'modifiers["{name}"]["{identifier}"]'
+
+
+# Pre-5.2 form of a modifier-input path: modifiers["Name"]["Socket_2"]
+_OLD_PATH_RE = re.compile(
+    r'^modifiers\["((?:[^"\\]|\\.)*)"\]\["([A-Za-z_]+_\d+)"\]$')
+
+
+def upgrade_data_path(owner, path):
+    """Rewrite a pre-5.2 modifier-input path stored in a driver or
+    F-curve into the running Blender's form. Returns the new path, or
+    None when nothing needs to change."""
+    match = _OLD_PATH_RE.match(path or "")
+    mods = getattr(owner, "modifiers", None)
+    if match is None or mods is None:
+        return None
+    mod = mods.get(match.group(1).replace('\\"', '"'))
+    if mod is None or not uses_rna_inputs(mod):
+        return None
+    if _slot(mod, match.group(2)) is None:
+        return None
+    return input_data_path(mod, match.group(2))
 
 
 def draw_input(layout, mod, identifier, **kwargs) -> bool:

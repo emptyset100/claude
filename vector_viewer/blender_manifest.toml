@@ -1,0 +1,23 @@
+schema_version = "1.0.0"
+
+id = "vector_viewer"
+version = "1.0.0"
+name = "Vector Viewer"
+tagline = "Visualisation animée de vecteurs cinématiques (r, v, a)"
+maintainer = "Empty"
+type = "add-on"
+
+blender_version_min = "4.2.0"
+
+license = ["SPDX:GPL-3.0-or-later"]
+
+tags = ["3D View", "Animation", "Geometry Nodes"]
+
+# NOTE
+# ----
+# Cette extension nécessite le module Python `sympy`.
+# Installez-le dans le Python embarqué de Blender :
+#
+#   "C:\\Program Files\\Blender Foundation\\Blender 5.1\\5.1\\python\\bin\\python.exe" -m pip install sympy
+#
+# (ou l'équivalent sur Linux/macOS)
